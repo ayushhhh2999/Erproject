@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-
+from timetable.models import Classroom
 ROLE_CHOICES = [
     ("SUPERADMIN", "Super Admin"),
     ("ADMIN", "Admin"),
@@ -113,13 +113,7 @@ class DashboardCreationRequest(models.Model):
 
 
 class PersonalDetail(models.Model):
-    """
-    Personal details for users (teachers, staff, students, etc.).
-    Excludes SUPERADMIN where used in views/querysets.
-    """
-    user = models.OneToOneField(
-        User, on_delete=models.CASCADE, related_name="personal_detail"
-    )
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="personal_detail")
     phone = models.CharField(max_length=20, blank=True, null=True)
     address = models.TextField(blank=True, null=True)
     dob = models.DateField(blank=True, null=True)
@@ -127,9 +121,17 @@ class PersonalDetail(models.Model):
     department = models.CharField(max_length=150, blank=True, null=True)
     emergency_contact = models.CharField(max_length=50, blank=True, null=True)
     additional_info = models.JSONField(blank=True, null=True)
-
-    # 👇 New field for storing image path or URL
     image_link = models.CharField(max_length=255, blank=True, null=True)
+
+    # ✅ Classroom field (ForeignKey)
+    classroom = models.ForeignKey(
+        Classroom,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        related_name="students",
+        help_text="Applicable only for students",
+    )
 
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -139,9 +141,7 @@ class PersonalDetail(models.Model):
         ordering = ["-updated_at"]
 
     def __str__(self):
-        return f"PersonalDetail: {self.user.username}"
-
-
+        return f"{self.user.username} ({self.classroom.name if self.classroom else 'No classroom'})"
 
 class Attendance(models.Model):
     STATUS_CHOICES = [

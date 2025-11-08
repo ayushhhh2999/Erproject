@@ -43,4 +43,5 @@ urlpatterns = [
     path("api/login/", LoginView.as_view(), name="api-login"),
     path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path("api/", include(router.urls)),
+    path("api/timetable/", include("timetable.urls")),
 ]

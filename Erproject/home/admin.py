@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import User, UserCreationRequest, Dashboard, DashboardCreationRequest
+from .models import User, UserCreationRequest, Dashboard, DashboardCreationRequest,PersonalDetail,Attendance
 
 
 class CustomUserAdmin(UserAdmin):
@@ -69,3 +69,42 @@ class DashboardCreationRequestAdmin(admin.ModelAdmin):
     list_filter = ("status", "created_at")
     search_fields = ("title", "requested_by__username")
     readonly_fields = ("created_at", "updated_at")
+
+
+@admin.register(PersonalDetail)
+class PersonalDetailAdmin(admin.ModelAdmin):
+    list_display = (
+        "id",
+        "user",
+        "phone",
+        "department",
+        "designation",
+        "classroom",  # ✅ shows classroom column
+        "is_active",
+        "updated_at",
+    )
+    list_filter = (
+        "is_active",
+        "department",
+        "designation",
+        "classroom",  # ✅ filter by classroom
+    )
+    search_fields = ("user__username", "user__email", "phone", "department")
+    ordering = ("-updated_at",)
+
+@admin.register(Attendance)
+class AttendanceAdmin(admin.ModelAdmin):
+    list_display = (
+        "id",
+        "user",
+        "date",
+        "status",
+        "check_in",
+        "check_out",
+        "recorded_by",
+        "created_at",
+        "updated_at",
+    )
+    search_fields = ("user__email", "recorded_by__email", "date", "status")
+    list_filter = ("status", "date", "created_at")
+    readonly_fields = ("created_at", "updated_at")    

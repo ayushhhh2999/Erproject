@@ -207,7 +207,8 @@ class PersonalDetailSerializer(serializers.ModelSerializer):
             "department",
             "emergency_contact",
             "additional_info",
-            "image_link",  # 👈 Added
+            "image_link",
+            "class_name",  # 👈 Added for students
             "is_active",
             "created_at",
             "updated_at",
@@ -218,19 +219,15 @@ class PersonalDetailSerializer(serializers.ModelSerializer):
         request = self.context.get("request")
         user = request.user if request else None
 
+        # ❌ Prevent SUPERADMIN from having a personal detail record
         if user and hasattr(user, "role") and user.role == "SUPERADMIN":
             raise serializers.ValidationError("Cannot create personal detail for SUPERADMIN.")
+
+        # ⚙️ If not a student, class_name must be empty
+        if user and hasattr(user, "role") and user.role != "STUDENT":
+            attrs["class_name"] = None
+
         return attrs
-
-
-    def validate(self, attrs):
-        request = self.context.get("request")
-        user = request.user if request else None
-
-        if user and hasattr(user, "role") and user.role == "SUPERADMIN":
-            raise serializers.ValidationError("Cannot create personal detail for SUPERADMIN.")
-        return attrs
-
 
 
 class AttendanceSerializer(serializers.ModelSerializer):

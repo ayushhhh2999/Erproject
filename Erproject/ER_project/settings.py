@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'home',
     'rest_framework',
     'rest_framework_simplejwt',
+    'timetable',
 ]
 
 AUTH_USER_MODEL = 'home.User'
